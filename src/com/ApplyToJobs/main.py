@@ -1,5 +1,5 @@
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException
+from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException, NoSuchWindowException
 
 import re
 import os
@@ -8,6 +8,8 @@ emailPattern = re.compile("(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
 experanceLevelPattern = re.compile("^[JjMmSsLl]")
 driver = webdriver.Firefox()
 data = {}
+f = open('log', 'a+')
+f.write('\n\n\n\n')
 
 
 def getUserData():
@@ -54,43 +56,50 @@ def login():
 
 # TODO close other links
 def recursiveApply(linkNum = 0):
-    time.sleep(5.12)
+    time.sleep(15.1)
     if linkNum != 23:
         # TODO get back to the jobs listing without going back to page 0
-        # driver.get('https://stackoverflow.com/jobs/')
-        driver.find_element_by_class_name('test-pagination-next').click()
+        # TODO allow for senior if there is junior as well
+        # TODO this is the class for the title "fc-black-900"
+        try:
+            driver.get('https://stackoverflow.com/jobs/')
+        except NoSuchWindowException:
+            driver.find_element_by_id('nav-jobs').click()
+        # driver.find_element_by_class_name('test-pagination-next').click()
         site = driver.find_elements_by_class_name('s-link__visited')[linkNum]
         try:
             site.click()
         except ElementClickInterceptedException:
             print('It failed to click on a new job link')
+            f.write('It failed to click on a new job link')
             driver.get('https://stackoverflow.com/jobs/')
             recursiveApply(linkNum + 1)
-        jobInfo = driver.find_elements_by_class_name('fw-bold')
+        jobInfo = driver.find_element_by_tag_name('body').text
         moveOn = False
+
         # Things you want in every posting
         for qualitiy in data[2].split(','):
-            for info in jobInfo:
-                if qualitiy.replace(' ', '') in info.text:
-                    moveOn = True
+            if qualitiy.replace(' ', '') in jobInfo:
+                moveOn = True
         # Things to avoid in a posting
         for qualitiy in data[3].split(','):
-            for info in jobInfo:
-                if qualitiy.replace(' ', '') in info.text:
-                    moveOn = False
+            if qualitiy.replace(' ', '') in jobInfo:
+                moveOn = False
         if not moveOn:
             print('The listing did not contain the experience level preference of the user')
+            f.write('The listing did not contain the experience level preference of the user')
             driver.get('https://stackoverflow.com/jobs/')
             recursiveApply(linkNum + 1)
         try:
             driver.find_element_by_class_name('_apply').click()
             driver.find_element_by_class_name('j-apply-btn').click()
             print('We applied to a job')
+            f.write('We applied to a job')
+            recursiveApply(linkNum + 1)
         except NoSuchElementException:
             print('It was not a proper form easy apply site')
-            driver.switch_to.window(driver.window_handles[1])
-            driver.close()
-        recursiveApply(linkNum + 1)
+            time.sleep(1.123)
+            recursiveApply(linkNum + 1)
     else:
         driver.get('https://stackoverflow.com/jobs/')
         driver.find_element_by_class_name('test-pagination-next').click()
