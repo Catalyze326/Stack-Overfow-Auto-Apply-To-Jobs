@@ -1,5 +1,5 @@
-#Stack Overflow Auto Job Apply
-In order to use this you must download the firefox web driver and put it somewhere in your path. You can find the driver here. https://www.seleniumhq.org/download/ 
+#Stack Overflow Jobs Auto Apply
+In order to use this you must download the firefox web driver and put it somewhere in your path. You can find the driver here. https://github.com/mozilla/geckodriver/releases
 
 You will also need to install selenium with pip
 
