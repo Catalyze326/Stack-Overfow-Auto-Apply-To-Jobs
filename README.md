@@ -3,9 +3,19 @@ In order to use this you must download the firefox web driver and put it somewhe
 
 You will also need to install selenium with pip
 
+
+```
+git clone https://github.com/Catalyze326/Stack-Overfow-Auto-job-Apply.git
+```
+```
+cd Stack-Overfow-Auto-job-Apply
+```
 ````
 pip3 install selenium
 ````
+```
+python3 main.py
+```
 
 Once you have that in your path and you have installed selenium and you answer its questions you should be able to let it run.
 
