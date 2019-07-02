@@ -6,7 +6,7 @@ import os
 import time
 emailPattern = re.compile("(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
 experanceLevelPattern = re.compile("^[JjMmSsLl]")
-driver = webdriver.Firefox()
+driver = webdriver.Chrome()
 data = {}
 
 
@@ -55,59 +55,55 @@ def login():
 
 # TODO close other links
 def recursiveApply(linkNum = 0):
-    print("Ran Recursive Apply")
-    time.sleep(5.12)
-    if linkNum % 23 != 0:
-        # TODO get back to the jobs listing without going back to page 0
-        driver.get('https://stackoverflow.com/jobs/')
+    print("Ran Recursive Apply\nLinkNumber = " + str(linkNum))
+    time.sleep(20.12)
+    # TODO get back to the jobs listing without going back to page 0
+    driver.get('https://stackoverflow.com/jobs')
+    for i in range(int(linkNum / 23)):
         driver.find_element_by_class_name('test-pagination-next').click()
-        site = driver.find_elements_by_class_name('s-link__visited')[int(linkNum % 23)]
-        try:
-            site.click()
-            print("\nClicked on new Job listing.")
-        except ElementClickInterceptedException:
-            print('It failed to click on a new job link')
-            driver.get('https://stackoverflow.com/jobs/')
-            recursiveApply(linkNum + 1)
-        time.sleep(1)
-        driver.execute_script('document.getElementsByClassName("sidebar")[0].remove();')
-        driver.execute_script('document.getElementById("more-jobs-items").remove();')
-        pureHTML = driver.page_source
-        jobTitle = driver.find_element_by_class_name('fc-black-900').text
-        print('Looking at job listing "' + jobTitle + '"')
-        moveOn = False
-        # Things you want in every posting
-        for qualitiy in data[2].split(','):
-            if qualitiy.replace(' ', '') in pureHTML:
-                print('Listing has: ' + qualitiy)
-                moveOn = True
-        if not moveOn:
-            print('The job listing is missing some quality you required.')
-            recursiveApply(linkNum + 1)
-        # Things to avoid in a posting
-        for qualitiy in data[3].split(','):
-            if qualitiy.replace(' ', '') in pureHTML:
-                print('Found quality: ' + qualitiy + ' which we are avoiding.')
-                recursiveApply(linkNum + 1)
-        else:
-            try:
-                driver.find_element_by_class_name('_apply').click()
-                driver.find_element_by_class_name('j-apply-btn').click()
-                print('We applied to a job titled: ' + jobTitle)
-                open('JobsAppliedTo.txt', 'a+').write(jobTitle + '\n')
-                recursiveApply(linkNum + 1)
-            except NoSuchElementException:
-                print('It was not a proper form easy apply site')
-                driver.switch_to.window(driver.window_handles[1])
-                driver.close()
-                recursiveApply(linkNum + 1)
-            except NoSuchWindowException:
-                recursiveApply(linkNum + 1)
-    else:
-        driver.get('https://stackoverflow.com/jobs/')
-        driver.find_element_by_class_name('test-pagination-next').click()
+        time.sleep(15)
+    site = driver.find_elements_by_class_name('s-link__visited')[int(linkNum % 23)]
+    try:
+        site.click()
+        print("\nClicked on new Job listing.")
+    except ElementClickInterceptedException:
+        print('It failed to click on a new job link')
+        driver.get('https://stackoverflow.com/jobs')
         recursiveApply(linkNum + 1)
-
+    time.sleep(1)
+    driver.execute_script('document.getElementsByClassName("sidebar")[0].remove();')
+    driver.execute_script('document.getElementById("more-jobs-items").remove();')
+    pureHTML = driver.page_source
+    jobTitle = driver.find_element_by_class_name('fc-black-900').text
+    print('Looking at job listing "' + jobTitle + '"')
+    moveOn = False
+    # Things you want in every posting
+    for qualitiy in data[2].split(','):
+        if qualitiy.replace(' ', '') in pureHTML:
+            print('Listing has: ' + qualitiy)
+            moveOn = True
+    if not moveOn:
+        print('The job listing is missing some quality you required.')
+        recursiveApply(linkNum + 1)
+    # Things to avoid in a posting
+    for qualitiy in data[3].split(','):
+        if qualitiy.replace(' ', '') in pureHTML:
+            print('Found quality: ' + qualitiy + ' which we are avoiding.')
+            recursiveApply(linkNum + 1)
+    else:
+        try:
+            driver.find_element_by_class_name('_apply').click()
+            driver.find_element_by_class_name('j-apply-btn').click()
+            print('We applied to a job titled: ' + jobTitle)
+            open('JobsAppliedTo.txt', 'a+').write(jobTitle + '        ' + driver.current_url + '\n')
+            recursiveApply(linkNum + 1)
+        except NoSuchElementException:
+            print('It was not a proper form easy apply site')
+            # driver.switch_to.window(driver.window_handles[1])
+            # driver.close()
+            recursiveApply(linkNum + 1)
+        except NoSuchWindowException:
+            recursiveApply(linkNum + 1)
 
 
 data = getUserData()
