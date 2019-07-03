@@ -6,7 +6,7 @@ import os
 import time
 emailPattern = re.compile("(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
 experanceLevelPattern = re.compile("^[JjMmSsLl]")
-driver = webdriver.Chrome()
+driver = webdriver.Firefox()
 data = {}
 
 
