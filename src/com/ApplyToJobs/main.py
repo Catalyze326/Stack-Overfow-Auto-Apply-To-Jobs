@@ -1,9 +1,13 @@
+# TODO add this lang or that lang
+# TODO migrate to json
+
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException, NoSuchWindowException
 
 import re
 import os
 import time
+
 emailPattern = re.compile("(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
 experanceLevelPattern = re.compile("^[JjMmSsLl]")
 driver = webdriver.Firefox()
@@ -56,12 +60,12 @@ def login():
 # TODO close other links
 def recursiveApply(linkNum = 0):
     print("Ran Recursive Apply\nLinkNumber = " + str(linkNum))
-    time.sleep(20.12)
+    time.sleep(15.12)
     # TODO get back to the jobs listing without going back to page 0
     driver.get('https://stackoverflow.com/jobs')
     for i in range(int(linkNum / 23)):
         driver.find_element_by_class_name('test-pagination-next').click()
-        time.sleep(15)
+        time.sleep(5)
     site = driver.find_elements_by_class_name('s-link__visited')[int(linkNum % 23)]
     try:
         site.click()
@@ -79,7 +83,7 @@ def recursiveApply(linkNum = 0):
     moveOn = False
     # Things you want in every posting
     for qualitiy in data[2].split(','):
-        if qualitiy.replace(' ', '') in pureHTML:
+        if qualitiy.lower() in str(pureHTML).lower():
             print('Listing has: ' + qualitiy)
             moveOn = True
     if not moveOn:
@@ -87,7 +91,7 @@ def recursiveApply(linkNum = 0):
         recursiveApply(linkNum + 1)
     # Things to avoid in a posting
     for qualitiy in data[3].split(','):
-        if qualitiy.replace(' ', '') in pureHTML:
+        if qualitiy.lower() in str(pureHTML).lower():
             print('Found quality: ' + qualitiy + ' which we are avoiding.')
             recursiveApply(linkNum + 1)
     else:
